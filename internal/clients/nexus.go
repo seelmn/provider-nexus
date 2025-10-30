@@ -11,8 +11,8 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/terraform"
 
-	clusterv1beta1 "github.com/crossplane/upjet-provider-template/apis/cluster/v1beta1"
-	namespacedv1beta1 "github.com/crossplane/upjet-provider-template/apis/namespaced/v1beta1"
+	clusterv1beta1 "github.com/seelmn/provider-nexus/apis/cluster/v1beta1"
+	namespacedv1beta1 "github.com/seelmn/provider-nexus/apis/namespaced/v1beta1"
 )
 
 const (
@@ -21,7 +21,16 @@ const (
 	errGetProviderConfig    = "cannot get referenced ProviderConfig"
 	errTrackUsage           = "cannot track ProviderConfig usage"
 	errExtractCredentials   = "cannot extract credentials"
-	errUnmarshalCredentials = "cannot unmarshal template credentials as JSON"
+	errUnmarshalCredentials = "cannot unmarshal nexus credentials as JSON"
+
+	username       = "username"
+	password       = "password"
+	url            = "url"
+	insecure       = "insecure"
+	clientCertPath = "client_cert_path"
+	clientKeyPath  = "client_key_path"
+	rootCaPath     = "root_ca_path"
+	timeout        = "timeout"
 )
 
 // TerraformSetupBuilder builds Terraform a terraform.SetupFn function which
@@ -51,10 +60,32 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 		}
 
 		// Set credentials in Terraform provider configuration.
-		/*ps.Configuration = map[string]any{
-			"username": creds["username"],
-			"password": creds["password"],
-		}*/
+		ps.Configuration = map[string]any{}
+		if v, ok := creds[username]; ok {
+			ps.Configuration[username] := v
+		}
+  		if v, ok := creds[password]; ok {
+  		  ps.Configuration[password] = v
+  		}
+  		if v, ok := creds[url]; ok {
+  		  ps.Configuration[url] = v
+  		}
+  		if v, ok := creds[insecure]; ok {
+  		  ps.Configuration[insecure] = v
+  		}
+  		if v, ok := creds[clientCertPath]; ok {
+  		  ps.Configuration[clientCertPath] = v
+  		}
+  		if v, ok := creds[clientKeyPath]; ok {
+  		  ps.Configuration[clientKeyPath] = v
+  		}
+  		if v, ok := creds[rootCaPath]; ok {
+  		  ps.Configuration[rootCaPath] = v
+  		}
+  		if v, ok := creds[timeout]; ok {
+  		  ps.Configuration[timeout] = v
+  		}
+		
 		return ps, nil
 	}
 }
