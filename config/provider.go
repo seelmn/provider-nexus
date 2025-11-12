@@ -6,8 +6,11 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
-	nullCluster "github.com/crossplane/upjet-provider-template/config/cluster/null"
-	nullNamespaced "github.com/crossplane/upjet-provider-template/config/namespaced/null"
+	repositoryMavenHostedCluster    "github.com/seelmn/provider-nexus/config/cluster/repositorymavenhosted"
+	repositoryPypiHostedCluster     "github.com/seelmn/provider-nexus/config/cluster/repositorypypihosted"
+
+	repositoryMavenHostedNamespaced "github.com/seelmn/provider-nexus/config/namespaced/repositorymavenhosted"
+	repositoryPypiHostedNamespaced  "github.com/seelmn/provider-nexus/config/namespaced/repositorypypihosted"
 )
 
 const (
@@ -24,7 +27,7 @@ var providerMetadata string
 // GetProvider returns provider configuration
 func GetProvider() *ujconfig.Provider {
 	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("template.crossplane.io"),
+		ujconfig.WithRootGroup("nexus.crossplane.io"),
 		ujconfig.WithIncludeList(ExternalNameConfigured()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
@@ -33,7 +36,8 @@ func GetProvider() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
-		nullCluster.Configure,
+		repositoryMavenHostedCluster.Configure,
+		repositoryPypiHostedCluster.Configure, 
 	} {
 		configure(pc)
 	}
@@ -45,7 +49,7 @@ func GetProvider() *ujconfig.Provider {
 // GetProviderNamespaced returns the namespaced provider configuration
 func GetProviderNamespaced() *ujconfig.Provider {
 	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("template.m.crossplane.io"),
+		ujconfig.WithRootGroup("nexus.m.crossplane.io"),
 		ujconfig.WithIncludeList(ExternalNameConfigured()),
 		ujconfig.WithFeaturesPackage("internal/features"),
 		ujconfig.WithDefaultResourceOptions(
@@ -57,7 +61,8 @@ func GetProviderNamespaced() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
-		nullNamespaced.Configure,
+		repositoryMavenHostedCluster.Configure,
+		repositoryPypiHostedCluster.Configure, 
 	} {
 		configure(pc)
 	}

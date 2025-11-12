@@ -8,7 +8,8 @@ import (
 // provider.
 var ExternalNameConfigs = map[string]config.ExternalName{
 	// Import requires using a randomly generated ID from provider: nl-2e21sda
-	"null_resource": idWithStub(),
+	"sonatyperepo_repository_maven_hosted": config.NameAsIdentifier,
+	"sonatyperepo_repository_pypi_hosted":  config.NameAsIdentifier,
 }
 
 func idWithStub() config.ExternalName {
