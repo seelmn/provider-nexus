@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	resourcePrefix = "template"
-	modulePath     = "github.com/crossplane/upjet-provider-template"
+	resourcePrefix = "sonatyperepo"
+	modulePath     = "github.com/seelmn/provider-nexus"
 )
 
 //go:embed schema.json
