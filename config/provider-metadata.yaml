@@ -1,40 +1,2489 @@
-name: hashicorp/null
+name: sonatype-nexus-community/sonatyperepo
 resources:
-    null_resource:
+    sonatyperepo_blob_store_file Resource - sonatyperepo:
         subCategory: ""
-        description: The null_resource resource implements the standard resource lifecycle but takes no further action. On Terraform 1.4 and later, use the terraform_data resource type https://developer.hashicorp.com/terraform/language/resources/terraform-data instead. Terraform 1.9 and later support the moved configuration block from null_resource to terraform_data. The triggers argument allows specifying an arbitrary set of values that, when changed, will cause the resource to be replaced.
-        name: null_resource
-        title: null_resource Resource - terraform-provider-null
+        description: Use this data source to get a specific File Blob Store by it's name
+        name: sonatyperepo_blob_store_file Resource - sonatyperepo
+        title: sonatyperepo_blob_store_file Resource - sonatyperepo
+        argumentDocs:
+            last_updated: (String)
+            limit: (Number) Quota limit
+            name: (String) Name of the Blob Store
+            path: (String) The Path on disk of this File Blob Store
+            soft_quota: (Attributes) Soft Quota for this Blob Store (see below for nested schema)
+            type: (String) Soft Quota type
+        importStatements: []
+    sonatyperepo_blob_store_gcs Resource - sonatyperepo:
+        subCategory: ""
+        description: Use this resource to create a Google Cloud Storage Blob Store
+        name: sonatyperepo_blob_store_gcs Resource - sonatyperepo
+        title: sonatyperepo_blob_store_gcs Resource - sonatyperepo
+        argumentDocs:
+            account_key: (String, Sensitive) The credentials JSON file content
+            authentication: (Block, Optional) Authentication Configuration for Google Cloud Storage (see below for nested schema)
+            authentication_method: (String) The type of Google Cloud authentication to use
+            bucket: (Block, Optional) Main Bucket Configuration for this Blob Store (see below for nested schema)
+            bucket_configuration: (Block, Optional) Bucket Configuration for this Google Cloud Storage Blob Store (see below for nested schema)
+            encryption: (Block, Optional) Encryption Configuration for Google Cloud Storage (see below for nested schema)
+            encryption_key: (String) CryptoKey ID for KMS encryption
+            encryption_type: (String) The type of GCP server side encryption to use
+            last_updated: (String)
+            limit: (Number) Quota limit in bytes
+            name: (String) Name of the Blob Store
+            prefix: (String) The path within your Cloud Storage bucket where blob data should be stored
+            project_id: (String) The Google Cloud project id for the bucket
+            region: (String) The Google Cloud region for the bucket
+            soft_quota: (Block, Optional) Soft Quota for this Blob Store (see below for nested schema)
+            type: (String) Type of this Blob Store - will always be 'gc_storage'
+        importStatements: []
+    sonatyperepo_blob_store_s3 Resource - sonatyperepo:
+        subCategory: ""
+        description: Use this data source to get a specific S3 Blob Store by it's name
+        name: sonatyperepo_blob_store_s3 Resource - sonatyperepo
+        title: sonatyperepo_blob_store_s3 Resource - sonatyperepo
+        argumentDocs:
+            access_key_id: (String, Sensitive) An IAM access key ID for granting access to the S3 bucket
+            advanced_bucket_connection: (Attributes) Advanced Connection Configuration for this S3 Blob Store (see below for nested schema)
+            bucket: (Attributes) Main Bucket Configuration for this Blob Store (see below for nested schema)
+            bucket_configuration: (Attributes) Bucket Configuration for this Blob Store (see below for nested schema)
+            bucket_security: (Attributes) Bucket Security Configuration for this Blob Store (see below for nested schema)
+            encryption: (Attributes) Bucket Encryption Configuration for this Blob Store (see below for nested schema)
+            encryption_key: (String, Sensitive) The encryption key
+            encryption_type: (String) The type of S3 server side encryption to use. Either 's3ManagedEncryption' or 'kmsManagedEncryption'
+            endpoint: (String) A custom endpoint URL for third party object stores using the S3 API
+            force_path_style: (Boolean) Setting this flag will result in path-style access being used for all requests
+            last_updated: (String)
+            limit: (Number) Quota limit
+            max_connection_pool_size: (Number) Setting this value will override the default connection pool size of Nexus of the s3 client for this blobstore
+            name: (String) Name of the Blob Store
+            prefix: (String) The S3 blob store (i.e S3 object) key prefix
+            region: (String) The AWS region to create a new S3 bucket in or an existing S3 bucket's region
+            role: (String) An IAM role to assume in order to access the S3 bucket
+            secret_access_key: (String, Sensitive) The secret access key associated with the specified IAM access key ID
+            session_token: (String, Sensitive) An AWS STS session token associated with temporary security credentials which grant access to the S3 bucket
+            signer_type: (String) An API signature version which may be required for third party object stores using the S3 API
+            soft_quota: (Attributes) Soft Quota for this Blob Store (see below for nested schema)
+            type: (String) Type of this Blob Store - will always be 's3'
+        importStatements: []
+    sonatyperepo_capability_audit:
+        subCategory: ""
+        description: 'Manage Capability: Audit NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_audit
+        title: sonatyperepo_capability_audit Resource - sonatyperepo
         examples:
-            - name: cluster
+            - name: cap_audit
               manifest: |-
                 {
-                  "connection": [
-                    {
-                      "host": "${element(aws_instance.cluster[*].public_ip, 0)}"
-                    }
-                  ],
-                  "provisioner": {
-                    "remote-exec": [
-                      {
-                        "inline": [
-                          "bootstrap-cluster.sh ${join(\" \",\n      aws_instance.cluster[*].private_ip)}"
-                        ]
-                      }
-                    ]
-                  },
-                  "triggers": {
-                    "cluster_instance_ids": "${join(\",\", aws_instance.cluster[*].id)}"
+                  "enabled": true,
+                  "notes": "These are notes from Terraform"
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+        importStatements:
+            - |-
+              # Import an existing Audit Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_audit.cap_audit CAPABILITY_ID
+    sonatyperepo_capability_base_url:
+        subCategory: ""
+        description: 'Manage Capability: Base URL NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_base_url
+        title: sonatyperepo_capability_base_url Resource - sonatyperepo
+        examples:
+            - name: cap_base_url
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "url": "https://my.fqdn.tld"
                   }
                 }
-              dependencies:
-                aws_instance.cluster: |-
-                    {
-                      "ami": "ami-0dcc1e21636832c5d",
-                      "count": 3,
-                      "instance_type": "m5.large"
-                    }
         argumentDocs:
-            id: (String) This is set to a random value at create time.
-            triggers: (Map of String) A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            url: (String) Reverse proxy base URL
+        importStatements:
+            - |-
+              # Import an existing Storage Settings Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_storage_settings.cap_base_url CAPABILITY_ID
+    sonatyperepo_capability_custom_s3_regions:
+        subCategory: ""
+        description: 'Manage Capability: Custom S3 Regions NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_custom_s3_regions
+        title: sonatyperepo_capability_custom_s3_regions Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "regions": [
+                      "somewhere-1",
+                      "somewhere-2"
+                    ]
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            regions: (Set of String) Custom S3 Regions.
+        importStatements:
+            - |-
+              # Import an existing S3 Custom Region Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_custom_s3_regions.cap CAPABILITY_ID
+    sonatyperepo_capability_default_role:
+        subCategory: ""
+        description: 'Manage Capability: Default Role NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_default_role
+        title: sonatyperepo_capability_default_role Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "role": "nx-anonymous"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            role: (String) The role which is automatically granted to authenticated users
+        importStatements:
+            - |-
+              # Import an existing Default Role Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_default_role.cap CAPABILITY_ID
+    sonatyperepo_capability_firewall_audit_and_quarantine:
+        subCategory: ""
+        description: 'Manage Capability: Firewall Audit and Quarantine NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_firewall_audit_and_quarantine
+        title: sonatyperepo_capability_firewall_audit_and_quarantine Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "quarantine": true,
+                    "repository": "maven-central"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            quarantine: (Boolean) Whether enable Quarantine for this repository.
+            repository: (String) The repository to be evaluated.
+        importStatements:
+            - |-
+              # Import an existing Firewall Audit & Quarantine Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_firewall_audit_and_quarantine.cap CAPABILITY_ID
+    sonatyperepo_capability_healthcheck:
+        subCategory: ""
+        description: 'Manage Capability: Healthcheck NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_healthcheck
+        title: sonatyperepo_capability_healthcheck Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "configured_for_all_proxies": true,
+                    "use_nexus_truststore": false
+                  }
+                }
+        argumentDocs:
+            configured_for_all_proxies: (Boolean) Configure all supported proxy repositories to regularly check with Sonatype Repository Healthcheck for updates by default. Newly added repositories will automatically be configured as well, for as long as this is selected.
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            use_nexus_truststore: (Boolean) Whether to use Nexus Truststore when communicating with Sonatype Repository Healthcheck.
+        importStatements:
+            - |-
+              # Import an existing Healthcheck Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_healthcheck.cap CAPABILITY_ID
+    sonatyperepo_capability_outreach_management:
+        subCategory: ""
+        description: 'Manage Capability: Outreach Management NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_outreach_management
+        title: sonatyperepo_capability_outreach_management Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "",
+                  "properties": {
+                    "always_remote": false,
+                    "override_url": "https://some.url.tld"
+                  }
+                }
+        argumentDocs:
+            always_remote: (Boolean) Always check the remote server for updates.
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            override_url: (String) Override external URL for downloading new Outreach content.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+        importStatements:
+            - |-
+              # Import an existing Outreach Management Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_outreach_management.cap CAPABILITY_ID
+    sonatyperepo_capability_rut_auth:
+        subCategory: ""
+        description: 'Manage Capability: RUT Auth NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_rut_auth
+        title: sonatyperepo_capability_rut_auth Resource - sonatyperepo
+        examples:
+            - name: cap_base_url
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "http_header": "X-Your-Custom-Header-Name"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            http_header: (String) Handled HTTP Header should contain the name of the header that is used to source the principal of already authenticated user.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+        importStatements:
+            - |-
+              # Import an existing RUT Auth Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_rut_auth.cap_base_url CAPABILITY_ID
+    sonatyperepo_capability_storage_settings:
+        subCategory: ""
+        description: 'Manage Capability: Storage Settings NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_storage_settings
+        title: sonatyperepo_capability_storage_settings Resource - sonatyperepo
+        examples:
+            - name: cap_storage_settings
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "last_downloaded_interval": 24
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_downloaded_interval: (Number) 'Last Downloaded' Update Interval (hours)
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+        importStatements:
+            - |-
+              # Import an existing Base URL Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_base_url.cap_base_url CAPABILITY_ID
+    sonatyperepo_capability_ui_branding:
+        subCategory: ""
+        description: 'Manage Capability: UI Branding NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_ui_branding
+        title: sonatyperepo_capability_ui_branding Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "",
+                  "properties": {
+                    "header_enabled": true,
+                    "header_html": "TESTING 1 2 3"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            footer_enabled: (Boolean) Enable branding header HTML snippet.
+            footer_html: (String) An HTML snippet to be included in branding header. Use '$baseUrl' to insert the base URL of the server (e.g. to reference an image).
+            header_enabled: (Boolean) Enable branding header HTML snippet.
+            header_html: (String) An HTML snippet to be included in branding header. Use '$baseUrl' to insert the base URL of the server (e.g. to reference an image).
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+        importStatements:
+            - |-
+              # Import an existing UI Branding Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_ui_branding.cap CAPABILITY_ID
+    sonatyperepo_capability_ui_settings:
+        subCategory: ""
+        description: 'Manage Capability: UI Settings NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_ui_settings
+        title: sonatyperepo_capability_ui_settings Resource - sonatyperepo
+        examples:
+            - name: cap
+              manifest: |-
+                {
+                  "enabled": true,
+                  "last_updated": "Thursday, 06-Nov-25 14:11:02 GMT",
+                  "notes": "Automatically added on Wed Oct 16 12:27:43 GMT 2024",
+                  "properties": {
+                    "debug_allowed": true,
+                    "long_request_timeout": 180,
+                    "request_timeout": 60,
+                    "session_timeout": 30,
+                    "status_interval_anonymous": 60,
+                    "status_interval_authenticated": 5,
+                    "title": "Sonatype Nexus Repository"
+                  }
+                }
+        argumentDocs:
+            debug_allowed: (Boolean) Allow developer debugging.
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            long_request_timeout: (Number) Period of time to keep the connection alive for requests expected to take an extended period of time (seconds).
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            request_timeout: (Number) Period of time to keep the connection alive for requests expected to take a normal period of time (seconds).
+            session_timeout: (Number) Period of inactivity before session times out (minutes). A value of 0 will mean that a session never expires.
+            status_interval_anonymous: (Number) Interval between status requests for anonymous user (seconds).
+            status_interval_authenticated: (Number) Interval between status requests for authenticated users (seconds).
+            title: (String) Browser page title.
+        importStatements:
+            - |-
+              # Import an existing UI Settings Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_ui_settings.cap CAPABILITY_ID
+    sonatyperepo_capability_webhook_global:
+        subCategory: ""
+        description: 'Manage Capability: Webhook Global NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_webhook_global
+        title: sonatyperepo_capability_webhook_global Resource - sonatyperepo
+        examples:
+            - name: webhook
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "names": [
+                      "repository"
+                    ],
+                    "secret": "super-secret-key",
+                    "url": "https://test.tld"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            names: (Set of String) Event types which trigger this Webhook.
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            secret: (String, Sensitive) Key to use for HMAC payload digest.
+            url: (String) Send a HTTP POST request to this URL.
+        importStatements:
+            - |-
+              # Import an existing Webhook (Global) Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_webhook_global.webhook CAPABILITY_ID
+    sonatyperepo_capability_webhook_repository:
+        subCategory: ""
+        description: 'Manage Capability: Webhook Repository NOTE: Requires Sonatype Nexus Repostiory 3.84.0 or later.'
+        name: sonatyperepo_capability_webhook_repository
+        title: sonatyperepo_capability_webhook_repository Resource - sonatyperepo
+        examples:
+            - name: webhook
+              manifest: |-
+                {
+                  "enabled": true,
+                  "notes": "These are notes from Terraform",
+                  "properties": {
+                    "names": [
+                      "component"
+                    ],
+                    "repository": "maven-central",
+                    "secret": "testing",
+                    "url": "https://test.tld"
+                  }
+                }
+        argumentDocs:
+            enabled: (Boolean) Whether the Capability is enabled.
+            id: (String) The internal ID of the Capability.
+            last_updated: (String)
+            names: (Set of String) Event types which trigger this Webhook.
+            notes: (String) Optional notes about configured capability.
+            properties: (Attributes) Properties specific to this Capability type (see below for nested schema)
+            repository: (String) Repository to discriminate events from.
+            secret: (String, Sensitive) Key to use for HMAC payload digest.
+            url: (String) Send a HTTP POST request to this URL.
+        importStatements:
+            - |-
+              # Import an existing Webhook (Repository) Capability into Terraform State.
+              #
+              # NOTE: The CAPABILITY_ID can be obtained from the datasource.
+
+              # Example
+              terraform import sonatyperepo_capability_webhook_repository.webhook CAPABILITY_ID
+    sonatyperepo_cleanup_policy Resource - sonatyperepo:
+        subCategory: ""
+        description: Use this resource to create and manage cleanup policies in Sonatype Nexus Repository Manager
+        name: sonatyperepo_cleanup_policy Resource - sonatyperepo
+        title: sonatyperepo_cleanup_policy Resource - sonatyperepo
+        argumentDocs:
+            asset_regex: (String) Remove components that have at least one asset name matching this regular expression
+            criteria: (Attributes) Cleanup criteria for this policy - at least one criterion must be specified (see below for nested schema)
+            format: (String) Repository format that this cleanup policy applies to
+            last_blob_updated: (Number) Remove components that haven't been downloaded in this many days
+            last_downloaded: (Number) Remove components that were last downloaded more than this many days ago
+            last_updated: (String)
+            name: (String) Name of the cleanup policy
+            notes: (String) Notes for the cleanup policy
+            release_type: (String) Remove components that match this release type (e.g., RELEASES, PRERELEASES)
+            retain: (Number) Minimum number of component versions to retain
         importStatements: []
+    sonatyperepo_content_selector:
+        subCategory: ""
+        description: Manage Content Selectors in Sonatype Nexus Repository
+        name: sonatyperepo_content_selector
+        title: sonatyperepo_content_selector Resource - sonatyperepo
+        examples:
+            - name: cs1
+              manifest: |-
+                {
+                  "description": "This is a test content selector",
+                  "expression": "format == \"maven2\" and path =^ \"/org/sonatype/sub\"",
+                  "name": "test-content-selector"
+                }
+        argumentDocs:
+            description: (String) The description of this Content Selector.
+            expression: (String) The Content Selector expression used to identify content.
+            last_updated: (String)
+            name: (String) The name of the Content Selector.
+        importStatements: []
+    sonatyperepo_privilege_application Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type application
+        name: sonatyperepo_privilege_application Resource - sonatyperepo
+        title: sonatyperepo_privilege_application Resource - sonatyperepo
+        argumentDocs:
+            actions: (Set of String) A set of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.
+            description: (String) Friendly description of this Privilege
+            domain: (String) The domain (i.e. 'blobstores', 'capabilities' or even '*' for all) that this privilege is granting access to. Note that creating new privileges with a domain is only necessary when using plugins that define their own domain(s).
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_privilege_repository_admin Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type repository-admin
+        name: sonatyperepo_privilege_repository_admin Resource - sonatyperepo
+        title: sonatyperepo_privilege_repository_admin Resource - sonatyperepo
+        argumentDocs:
+            actions: (Set of String) A set of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.
+            description: (String) Friendly description of this Privilege
+            format: (String) The repository format (i.e 'nuget', 'npm') this privilege will grant access to (or * for all).
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            repository: (String) The name of the repository this privilege will grant access to (or * for all).
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_privilege_repository_content_selector Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type repository-content-selector
+        name: sonatyperepo_privilege_repository_content_selector Resource - sonatyperepo
+        title: sonatyperepo_privilege_repository_content_selector Resource - sonatyperepo
+        argumentDocs:
+            actions: (Set of String) A set of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.
+            content_selector: (String) The name of a content selector that will be used to grant access to content via this privilege.
+            description: (String) Friendly description of this Privilege
+            format: (String) The repository format (i.e 'nuget', 'npm') this privilege will grant access to (or * for all).
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            repository: (String) The name of the repository this privilege will grant access to (or * for all).
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_privilege_repository_view Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type repository-view
+        name: sonatyperepo_privilege_repository_view Resource - sonatyperepo
+        title: sonatyperepo_privilege_repository_view Resource - sonatyperepo
+        argumentDocs:
+            actions: (Set of String) A set of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.
+            description: (String) Friendly description of this Privilege
+            format: (String) The repository format (i.e 'nuget', 'npm') this privilege will grant access to (or * for all).
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            repository: (String) The name of the repository this privilege will grant access to (or * for all).
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_privilege_script Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type script
+        name: sonatyperepo_privilege_script Resource - sonatyperepo
+        title: sonatyperepo_privilege_script Resource - sonatyperepo
+        argumentDocs:
+            actions: (Set of String) A set of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.
+            description: (String) Friendly description of this Privilege
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            script_name: (String) The name of a script to give access to.
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_privilege_wildcard Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage a Privilege of type wildcard
+        name: sonatyperepo_privilege_wildcard Resource - sonatyperepo
+        title: sonatyperepo_privilege_wildcard Resource - sonatyperepo
+        argumentDocs:
+            description: (String) Friendly description of this Privilege
+            last_updated: (String)
+            name: (String) The name of the privilege. This value cannot be changed.
+            pattern: (String) A colon separated list of parts that create a permission string.
+            read_only: (Boolean) Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system.
+            type: (String) The type of privilege, each type covers different portions of the system. External values supplied to this will be ignored by the system.
+        importStatements: []
+    sonatyperepo_repository_apt_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted APT Repositories
+        name: sonatyperepo_repository_apt_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_apt_hosted Resource - sonatyperepo
+        argumentDocs:
+            apt: (Attributes) APT specific configuration for this Repository (see below for nested schema)
+            apt_signing: (Attributes) APT signing configuration for this Repository (see below for nested schema)
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            distribution: (String) Distribution to fetch
+            key_pair: (String) PGP signing key pair (armored private key e.g. gpg --export-secret-key --armor)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            passphrase: (String, Sensitive) Passphrase to access PGP signing key
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_apt_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy APT Repositories
+        name: sonatyperepo_repository_apt_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_apt_proxy Resource - sonatyperepo
+        argumentDocs:
+            apt: (Attributes) APT specific configuration for this Repository (see below for nested schema)
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            distribution: (String) Distribution to fetch
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            flat: (Boolean) Whether this repository is flat
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_cargo_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group CARGO Repositories
+        name: sonatyperepo_repository_cargo_group Resource - sonatyperepo
+        title: sonatyperepo_repository_cargo_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cargo: (Attributes) Cargo specific configuration for this Repository (see below for nested schema)
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            require_authentication: (Boolean) Indicates if this repository requires authentication overriding anonymous access.
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_cargo_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted CARGO Repositories
+        name: sonatyperepo_repository_cargo_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_cargo_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_cargo_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy CARGO Repositories
+        name: sonatyperepo_repository_cargo_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_cargo_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cargo: (Attributes) Cargo specific configuration for this Repository (see below for nested schema)
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            require_authentication: (Boolean) Indicates if this repository requires authentication overriding anonymous access.
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_cocoapods_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy COCOAPODS Repositories
+        name: sonatyperepo_repository_cocoapods_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_cocoapods_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_composer_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy COMPOSER Repositories
+        name: sonatyperepo_repository_composer_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_composer_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_conan_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group CONAN Repositories
+        name: sonatyperepo_repository_conan_group Resource - sonatyperepo
+        title: sonatyperepo_repository_conan_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            writable_member: (String) This field is for the Group Deployment feature available in Sonatype Nexus Repository Pro.
+        importStatements: []
+    sonatyperepo_repository_conan_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted CONAN Repositories
+        name: sonatyperepo_repository_conan_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_conan_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_conan_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy CONAN Repositories
+        name: sonatyperepo_repository_conan_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_conan_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            conan: (Attributes) Conan Proxy specific configuration for this Repository (see below for nested schema)
+            conan_version: (String) Conan protocol version. Cannot be changed once repository is created.
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_conda_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy CONDA Repositories
+        name: sonatyperepo_repository_conda_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_conda_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_docker_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group DOCKER Repositories
+        name: sonatyperepo_repository_docker_group Resource - sonatyperepo
+        title: sonatyperepo_repository_docker_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            docker: (Attributes) Docker specific configuration for this Repository (see below for nested schema)
+            force_basic_auth: (Boolean) Whether to force authentication (Docker Bearer Token Realm required if false)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            http_port: (Number) Create an HTTP connector at specified port
+            https_port: (Number) Create an HTTPS connector at specified port
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            path_enabled: (Boolean) Allows to use repository name in Docker image paths (only supply for Sonatype Nexus Repository Manager >= 3.83.0)
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            subdomain: (String) Allows to use subdomain
+            url: (String) URL to access the Repository
+            v1_enabled: (Boolean) Whether to allow clients to use the V1 API to interact with this repository
+            writable_member: (String) This field is for the Group Deployment feature available in Sonatype Nexus Repository Pro.
+        importStatements:
+            - |-
+              # Existing group docker repository configuration can be imported as follows.
+              #
+              # NOTE: The Identifier REPOSITORY_NAME needs to match repository name in your sonatype nexus repository instance.
+
+              # Example
+              terraform import sonatyperepo_repository_docker_group.docker REPOSITORY_NAME
+    sonatyperepo_repository_docker_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted DOCKER Repositories
+        name: sonatyperepo_repository_docker_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_docker_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            docker: (Attributes) Docker specific configuration for this Repository (see below for nested schema)
+            force_basic_auth: (Boolean) Whether to force authentication (Docker Bearer Token Realm required if false)
+            http_port: (Number) Create an HTTP connector at specified port
+            https_port: (Number) Create an HTTPS connector at specified port
+            last_updated: (String)
+            latest_policy: (Boolean) Whether to allow redeploying the 'latest' tag but defer to the Deployment Policy for all other tags. Only applicable for Hosted Docker Repositories when Deployment Policy is set to Disable.
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            path_enabled: (Boolean) Allows to use repository name in Docker image paths (only supply for Sonatype Nexus Repository Manager >= 3.83.0)
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            subdomain: (String) Allows to use subdomain
+            url: (String) URL to access the Repository
+            v1_enabled: (Boolean) Whether to allow clients to use the V1 API to interact with this repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements:
+            - |-
+              # Existing hosted docker repository configuration can be imported as follows.
+              #
+              # NOTE: The Identifier REPOSITORY_NAME needs to match repository name in your sonatype nexus repository instance.
+
+              # Example
+              terraform import sonatyperepo_repository_docker_hosted.docker REPOSITORY_NAME
+    sonatyperepo_repository_docker_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy DOCKER Repositories
+        name: sonatyperepo_repository_docker_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_docker_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cache_foreign_layers: (Boolean) Allow Nexus Repository Manager to download and cache foreign layers
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            docker: (Attributes) Docker specific configuration for this Repository (see below for nested schema)
+            docker_proxy: (Attributes) Docker Proxy specific configuration for this Repository (see below for nested schema)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            force_basic_auth: (Boolean) Whether to force authentication (Docker Bearer Token Realm required if false)
+            foreign_layer_url_whitelist: (Set of String) Foreign Layer URL Whitelist
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            http_port: (Number) Create an HTTP connector at specified port
+            https_port: (Number) Create an HTTPS connector at specified port
+            index_type: (String) Type of Docker Index
+            index_url: (String) Url of Docker Index to use
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            path_enabled: (Boolean) Allows to use repository name in Docker image paths (only supply for Sonatype Nexus Repository Manager >= 3.83.0)
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            subdomain: (String) Allows to use subdomain
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+            v1_enabled: (Boolean) Whether to allow clients to use the V1 API to interact with this repository
+        importStatements:
+            - |-
+              # Existing proxy docker repository configuration can be imported as follows.
+              #
+              # NOTE: The Identifier REPOSITORY_NAME needs to match repository name in your sonatype nexus repository instance.
+
+              # Example
+              terraform import sonatyperepo_repository_docker_proxy.docker REPOSITORY_NAME
+    sonatyperepo_repository_gitlfs_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted GITLFS Repositories
+        name: sonatyperepo_repository_gitlfs_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_gitlfs_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_go_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group GO Repositories
+        name: sonatyperepo_repository_go_group Resource - sonatyperepo
+        title: sonatyperepo_repository_go_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_go_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy GO Repositories
+        name: sonatyperepo_repository_go_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_go_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_helm_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted HELM Repositories
+        name: sonatyperepo_repository_helm_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_helm_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_helm_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy HELM Repositories
+        name: sonatyperepo_repository_helm_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_helm_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_huggingface_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy HUGGINGFACE Repositories
+        name: sonatyperepo_repository_huggingface_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_huggingface_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_maven_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group MAVEN Repositories
+        name: sonatyperepo_repository_maven_group Resource - sonatyperepo
+        title: sonatyperepo_repository_maven_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_maven_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted MAVEN Repositories
+        name: sonatyperepo_repository_maven_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_maven_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            content_disposition: (String) Add Content-Disposition header as 'ATTACHMENT' to disable some content from being inline in a browser.
+            last_updated: (String)
+            layout_policy: (String) Validate that all paths are maven artifact or metadata paths
+            maven: (Attributes) Maven specific configuration for this Repository (see below for nested schema)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            version_policy: (String) What type of artifacts does this repository store?
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_maven_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy MAVEN Repositories
+        name: sonatyperepo_repository_maven_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_maven_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_disposition: (String) Add Content-Disposition header as 'ATTACHMENT' to disable some content from being inline in a browser.
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            layout_policy: (String) Validate that all paths are maven artifact or metadata paths
+            maven: (Attributes) Maven specific configuration for this Repository (see below for nested schema)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+            version_policy: (String) What type of artifacts does this repository store?
+        importStatements: []
+    sonatyperepo_repository_npm_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group NPM Repositories
+        name: sonatyperepo_repository_npm_group Resource - sonatyperepo
+        title: sonatyperepo_repository_npm_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            writable_member: (String) This field is for the Group Deployment feature available in Sonatype Nexus Repository Pro.
+        importStatements: []
+    sonatyperepo_repository_npm_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted NPM Repositories
+        name: sonatyperepo_repository_npm_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_npm_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_npm_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy NPM Repositories
+        name: sonatyperepo_repository_npm_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_npm_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            npm: (Attributes) NPM specific configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            remove_quarrantined: (Boolean) Remove Quarantined Versions
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_nuget_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group NUGET Repositories
+        name: sonatyperepo_repository_nuget_group Resource - sonatyperepo
+        title: sonatyperepo_repository_nuget_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_nuget_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted NUGET Repositories
+        name: sonatyperepo_repository_nuget_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_nuget_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_nuget_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy NUGET Repositories
+        name: sonatyperepo_repository_nuget_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_nuget_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            nuget_proxy: (Attributes) Nuget specific configuration for this Repository (see below for nested schema)
+            nuget_version: (String) Nuget Protocol Versions
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            query_cache_item_max_age: (Number) How long to cache query results from the proxied repository (in seconds)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_p2_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy P2 Repositories
+        name: sonatyperepo_repository_p2_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_p2_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_pypi_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group PYPI Repositories
+        name: sonatyperepo_repository_pypi_group Resource - sonatyperepo
+        title: sonatyperepo_repository_pypi_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            writable_member: (String) This field is for the Group Deployment feature available in Sonatype Nexus Repository Pro.
+        importStatements: []
+    sonatyperepo_repository_pypi_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted PYPI Repositories
+        name: sonatyperepo_repository_pypi_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_pypi_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_pypi_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy PYPI Repositories
+        name: sonatyperepo_repository_pypi_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_pypi_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            pypi: (Attributes) PyPi specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            remove_quarrantined: (Boolean) Remove Quarantined Versions
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_r_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group R Repositories
+        name: sonatyperepo_repository_r_group Resource - sonatyperepo
+        title: sonatyperepo_repository_r_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_r_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted R Repositories
+        name: sonatyperepo_repository_r_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_r_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_r_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy R Repositories
+        name: sonatyperepo_repository_r_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_r_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_raw_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group RAW Repositories
+        name: sonatyperepo_repository_raw_group Resource - sonatyperepo
+        title: sonatyperepo_repository_raw_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            content_disposition: (String) Content Disposition
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            raw: (Attributes) Raw specific configuration for this Repository (see below for nested schema)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_raw_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted RAW Repositories
+        name: sonatyperepo_repository_raw_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_raw_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            content_disposition: (String) Content Disposition
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            raw: (Attributes) Raw specific configuration for this Repository (see below for nested schema)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_raw_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy RAW Repositories
+        name: sonatyperepo_repository_raw_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_raw_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_disposition: (String) Content Disposition
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            raw: (Attributes) Raw specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_ruby_gems_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group RUBY_GEMS Repositories
+        name: sonatyperepo_repository_ruby_gems_group Resource - sonatyperepo
+        title: sonatyperepo_repository_ruby_gems_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+        importStatements: []
+    sonatyperepo_repository_ruby_gems_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted RUBY_GEMS Repositories
+        name: sonatyperepo_repository_ruby_gems_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_ruby_gems_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+        importStatements: []
+    sonatyperepo_repository_ruby_gems_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy RUBY_GEMS Repositories
+        name: sonatyperepo_repository_ruby_gems_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_ruby_gems_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+        importStatements: []
+    sonatyperepo_repository_yum_group Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Group YUM Repositories
+        name: sonatyperepo_repository_yum_group Resource - sonatyperepo
+        title: sonatyperepo_repository_yum_group Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            group: (Attributes) Group specific configuration for this Repository (see below for nested schema)
+            key_pair: (String) PGP signing key pair (armored private key e.g. gpg --export-secret-key --armor)
+            last_updated: (String)
+            member_names: (List of String) Member repositories' names
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            passphrase: (String, Sensitive) Passphrase to access PGP signing key
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            yum: (Attributes) YUM specific configuration for this Repository (see below for nested schema)
+        importStatements: []
+    sonatyperepo_repository_yum_hosted Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Hosted YUM Repositories
+        name: sonatyperepo_repository_yum_hosted Resource - sonatyperepo
+        title: sonatyperepo_repository_yum_hosted Resource - sonatyperepo
+        argumentDocs:
+            blob_store_name: (String) Name of the Blob Store to use
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            component: (Attributes) Component configuration for this Repository (see below for nested schema)
+            deploy_policy: (String) Validate that all paths are RPMs or yum metadata.
+            last_updated: (String)
+            name: (String) Name of the Repository
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            proprietary_components: (Boolean) Components in this repository count as proprietary for namespace conflict attacks (requires Sonatype Nexus Repository Firewall)
+            repo_data_depth: (Number) Specifies the repository depth where repodata folder(s) are created
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            url: (String) URL to access the Repository
+            write_policy: (String) Controls if deployments of and updates to assets are allowed
+            yum: (Attributes) YUM specific configuration for this Repository (see below for nested schema)
+        importStatements: []
+    sonatyperepo_repository_yum_proxy Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Proxy YUM Repositories
+        name: sonatyperepo_repository_yum_proxy Resource - sonatyperepo
+        title: sonatyperepo_repository_yum_proxy Resource - sonatyperepo
+        argumentDocs:
+            asset_path_regex: (String) Regular Expression of Asset Paths to pull pre-emptively pull
+            authentication: (Attributes) Authentication to upstream Repository (see below for nested schema)
+            auto_block: (Boolean) Whether to auto-block outbound connections if remote peer is detected as unreachable/unresponsive
+            bearer_token: (String, Sensitive) Bearer Token used when Authentication Type == bearerToken
+            blob_store_name: (String) Name of the Blob Store to use
+            blocked: (Boolean) Whether to block outbound connections on the repository
+            cleanup: (Attributes) Repository Cleanup configuration (see below for nested schema)
+            connection: (Attributes) HTTP Client Connection configuration for this Repository (see below for nested schema)
+            content_max_age: (Number) How long to cache artifacts before rechecking the remote repository (in minutes)
+            enable_circular_redirects: (Boolean) Whether to enable redirects to the same location (may be required by some servers)
+            enable_cookies: (Boolean) Whether to allow cookies to be stored and used
+            enabled: (Boolean) Whether to cache responses for content not present in the proxied repository
+            http_client: (Attributes) HTTP Client configuration for this Repository (see below for nested schema)
+            key_pair: (String) PGP signing key pair (armored private key e.g. gpg --export-secret-key --armor)
+            last_updated: (String)
+            metadata_max_age: (Number) How long to cache metadata before rechecking the remote repository (in minutes)
+            name: (String) Name of the Repository
+            negative_cache: (Attributes) Negative Cache configuration for this Repository (see below for nested schema)
+            ntlm_domain: (String) NTLM Domain
+            ntlm_host: (String) NTLM Host
+            online: (Boolean) Whether this Repository is online and accepting incoming requests
+            passphrase: (String, Sensitive) Passphrase to access PGP signing key
+            password: (String, Sensitive) Password
+            policy_names: (Set of String) Set of Cleanup Policies that will apply to this Repository
+            preemptive: (Boolean) Whether to use pre-emptive authentication. Use with caution. Defaults to false.
+            preemptive_pull_enabled: (Boolean) Whether pre-emptive pull is enabled
+            proxy: (Attributes) Proxy specific configuration for this Repository (see below for nested schema)
+            remote_url: (String) Location of the remote repository being proxied
+            replication: (Attributes) Replication configuration for this Repository (see below for nested schema)
+            retries: (Number) Total retries if the initial connection attempt suffers a timeout
+            routing_rule: (String) Routing Rule
+            storage: (Attributes) Storage configuration for this Repository (see below for nested schema)
+            strict_content_type_validation: (Boolean) Whether this Repository validates that all content uploaded to this repository is of a MIME type appropriate for the repository format
+            time_to_live: (Number) How long to cache the fact that a file was not found in the repository (in minutes)
+            timeout: (Number) Seconds to wait for activity before stopping and retrying the connection
+            type: (String) Authentication type
+            url: (String) URL to access the Repository
+            use_trust_store: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to external systems
+            user_agent_suffix: (String) Custom fragment to append to User-Agent header in HTTP requests
+            username: (String) Username
+            yum: (Attributes) YUM specific configuration for this Repository (see below for nested schema)
+        importStatements: []
+    sonatyperepo_role Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Roles in Sonatype Nexus Repository
+        name: sonatyperepo_role Resource - sonatyperepo
+        title: sonatyperepo_role Resource - sonatyperepo
+        argumentDocs:
+            description: (String) The description of this role.
+            id: (String) The id of the Role.
+            last_updated: (String)
+            name: (String) The name of the role.
+            privileges: (Set of String) The set of privileges assigned to this role.
+            roles: (Set of String) The set of roles assigned to this role.
+        importStatements:
+            - |-
+              # Existing proxy docker repository configuration can be imported as follows.
+              #
+              # NOTE: The Identifier ROLE_NAME needs to match role name in your sonatype nexus repository instance.
+
+              # Example
+              terraform import sonatyperepo_role.role_name ROLE_NAME
+    sonatyperepo_routing_rule:
+        subCategory: ""
+        description: Use this resource to create and manage routing rules in Sonatype Nexus Repository Manager
+        name: sonatyperepo_routing_rule
+        title: sonatyperepo_routing_rule Resource - sonatyperepo
+        examples:
+            - name: block_example
+              manifest: |-
+                {
+                  "description": "Block requests matching example.com paths",
+                  "matchers": [
+                    "^/com/example/.*",
+                    "^/org/example/.*"
+                  ],
+                  "mode": "BLOCK",
+                  "name": "block-example-paths"
+                }
+            - name: allow_approved
+              manifest: |-
+                {
+                  "description": "Allow only approved organization paths",
+                  "matchers": [
+                    "^/com/approved/.*",
+                    "^/org/approved/.*",
+                    "^/io/approved/.*"
+                  ],
+                  "mode": "ALLOW",
+                  "name": "allow-approved-only"
+                }
+        argumentDocs:
+            description: (String) Description of the routing rule (required by Nexus API)
+            last_updated: (String)
+            matchers: (Set of String) Regular expressions used to identify request paths that are allowed or blocked (depending on mode)
+            mode: '(String) Determines what should be done with requests when their path matches any of the matchers. Valid values: ALLOW, BLOCK'
+            name: (String) Name of the routing rule
+        importStatements:
+            - |-
+              # Existing routing rule configuration can be imported as follows.
+              #
+              # NOTE: The Identifier ROUTING_RULE_NAME needs to match routing rule name in your Sonatype Nexus Repository instance.
+
+              # Example
+              terraform import sonatyperepo_routing_rule.block_example ROUTING_RULE_NAME
+    sonatyperepo_security_realms Resource - sonatyperepo:
+        subCategory: ""
+        description: Activate and order Sontaype Nexus Repository Security realms. This resource manages the configuration of active security realms and their order.
+        name: sonatyperepo_security_realms Resource - sonatyperepo
+        title: sonatyperepo_security_realms Resource - sonatyperepo
+        argumentDocs:
+            active: (List of String) Specify active security realms in usage order. At least one realm must be specified.
+            id: (String) Resource identifier
+        importStatements:
+            - |-
+              # Existing Security Realms configuration can be imported as follows.
+              #
+              # NOTE: The Identifier (SECURITY_REALMS) in below example has no meaning and is just to comply with Terraform syntax.
+
+              # Example
+              terraform import sonatyperepo_security_realms.realms SECURITY_REALMS
+    sonatyperepo_security_saml Resource - sonatyperepo:
+        subCategory: ""
+        description: Configure Sonatype Nexus Repository Security SAML.
+        name: sonatyperepo_security_saml Resource - sonatyperepo
+        title: sonatyperepo_security_saml Resource - sonatyperepo
+        argumentDocs:
+            email_attribute: (String) IdP field mappings for user's email
+            entity_id: (String) SAML Entity ID (typically a URI)
+            first_name_attribute: (String) IdP field mappings for user's given name
+            groups_attribute: (String) IdP field mappings for user's groups
+            idp_metadata: (String) SAML Identity Provider Metadata XML
+            last_name_attribute: (String) IdP field mappings for user's family name
+            username_attribute: (String) IdP field mappings for username
+            validate_assertion_signature: (Boolean) By default, if a signing key is found in the IdP metadata, then Sonatype Nexus Repository Manager will attempt to validate signatures on the assertions.
+            validate_response_signature: (Boolean) Validate SAML response signature
+        importStatements:
+            - |-
+              # Existing Security SAML configuration can be imported as follows.
+              #
+              # NOTE: The Identifier (SAML) in below example has no meaning and is just to comply with Terraform syntax.
+
+              # Example
+              terraform import sonatyperepo_security_saml.saml SAML
+    sonatyperepo_security_user_tokens Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage User Token Configuration
+        name: sonatyperepo_security_user_tokens Resource - sonatyperepo
+        title: sonatyperepo_security_user_tokens Resource - sonatyperepo
+        argumentDocs:
+            enabled: (Boolean) Whether or not User Tokens feature is enabled
+            expiration_days: (Number) Set user token expiration days (1-999)
+            expiration_enabled: (Boolean) Enable user tokens expiration
+            last_updated: (String)
+            protect_content: (Boolean) Additionally require user tokens for repository authentication
+        importStatements: []
+    sonatyperepo_system_anonymous_access Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Anonymous Access
+        name: sonatyperepo_system_anonymous_access Resource - sonatyperepo
+        title: sonatyperepo_system_anonymous_access Resource - sonatyperepo
+        argumentDocs:
+            enabled: (Boolean) Whether or not Anonymous Access is enabled
+            last_updated: (String)
+            realm_name: (String) The name of the authentication realm for the anonymous account
+            user_id: (String) The username of the anonymous account
+        importStatements:
+            - |-
+              # Existing Anonymous Access configuraiton can be imported as follows.
+              #
+              # NOTE: The Identifier (ANONYMOUS_ACCESS) in below example has no meaning and is just to comply with Terraform syntax.
+
+              # Example
+              terraform import sonatyperepo_system_anonymous_access.anonymous ANONYMOUS_ACCESS
+    sonatyperepo_system_config_ldap_connection Resource - sonatyperepo:
+        subCategory: ""
+        description: Configure and LDAP connection
+        name: sonatyperepo_system_config_ldap_connection Resource - sonatyperepo
+        title: sonatyperepo_system_config_ldap_connection Resource - sonatyperepo
+        argumentDocs:
+            auth_password: (String, Sensitive) The password to bind with. Required if authScheme other than NONE.
+            auth_realm: (String) The SASL realm to bind to. Required if authScheme is CRAM_MD5 or DIGEST_MD5.
+            auth_scheme: (String) Authentication scheme used for connecting to LDAP server
+            auth_username: (String) This must be a fully qualified username if simple authentication is used. Required if authScheme other than NONE.
+            connection_retry_delay: (Number) How many seconds to wait before retrying
+            connection_timeout: (Number) How many seconds to wait before timeout
+            group_base_dn: (String) The relative DN where group objects are found (e.g. ou=Group). This value will have the Search base DN value appended to form the full Group search base DN. e.g. ou=Group
+            group_id_attribute: (String) This field specifies the attribute of the Object class that defines the Group ID. Required if groupType is STATIC - e.g. cn
+            group_member_attribute: (String) LDAP attribute containing the usernames for the group. Required if groupType is STATIC - e.g. memberUid
+            group_member_format: (String) The format of user ID stored in the group member attribute. Required if groupType is STATIC - e.g. uid=${username},ou=people,dc=example,dc=com
+            group_object_class: (String) LDAP class for group objects. Required if groupType is STATIC - e.g. posixGroup
+            group_subtree: (Boolean) Are groups located in structures below the group base DN?
+            group_type: '(String) Defines a type of groups used: static (a group contains a list of users) or dynamic (a user contains a list of groups). Required if ldapGroupsAsRoles is true.'
+            hostname: (String) LDAP server hostname
+            id: (String) Internal LDAP server ID
+            last_updated: (String)
+            map_ldap_groups_to_roles: (Boolean) Denotes whether LDAP assigned roles are used as Nexus Repository Manager roles
+            max_connection_attempts: (Number) How many connection attempts before giving up
+            name: (String) LDAP connection name
+            nexus_trust_store_enabled: (Boolean) Whether to use certificates stored in Nexus Repository Manager's truststore
+            order: (Number) Order number in which the server is being used when looking for a user - cannot be set during CREATE
+            port: (Number) LDAP server port
+            protocol: (String) The user's status
+            search_base: (String) LDAP location to be added to the connection URL
+            user_base_dn: (String) The relative DN where user objects are found (e.g. ou=people). This value will have the Search base DN value appended to form the full User search base DN.
+            user_email_name_attribute: (String) This is used to find an email address given the user ID - e.g. mail
+            user_id_attribute: (String) This is used to find a user given its user ID - e.g. uid
+            user_ldap_filter: (String) LDAP search filter to limit user search - e.g. (|(mail=@example.com)(uid=dom))
+            user_member_of_attribute: (String) Set this to the attribute used to store the attribute which holds groups DN in the user object. Required if group_type is DYNAMIC
+            user_object_class: (String) LDAP class for user objects - e.g. inetOrgPerson
+            user_password_attribute: (String) If this field is blank the user will be authenticated against a bind with the LDAP server
+            user_real_name_attribute: (String) This is used to find a real name given the user ID - e.g. cn
+            user_subtree: (Boolean) Are users located in structures below the user base DN?
+        importStatements: []
+    sonatyperepo_system_config_mail Resource - sonatyperepo:
+        subCategory: ""
+        description: Configure the System Email Server
+        name: sonatyperepo_system_config_mail Resource - sonatyperepo
+        title: sonatyperepo_system_config_mail Resource - sonatyperepo
+        argumentDocs:
+            enabled: (Boolean) Whether Email Server is enabled
+            from_address: (String) From Address to use when sending emails
+            host: (String) SMTP Server Hostname
+            last_updated: (String)
+            nexus_trust_store_enabled: (Boolean) Use certificate connected to the Nexus Repository Truststore
+            password: (String, Sensitive) Password to use for authentication with SMTP Server
+            port: (Number) SMTP Server Port
+            ssl_on_connect_enabled: (Boolean) Enable SSL/TLS encryption upon connection
+            ssl_server_identity_check_enabled: (Boolean) Enable server identity check
+            start_tls_enabled: (Boolean) Enable STARTTLS support for insecure connections
+            start_tls_required: (Boolean) Require STARTTLS support
+            subject_prefix: (String) A prefix to use in Subject Lines for emails that are sent
+            username: (String) Username to use for authentication with SMTP Server
+        importStatements:
+            - |-
+              # Existing System Mail configuration can be imported as follows.
+              #
+              # NOTE: The Identifier (CONFIG_MAIL) in below example has no meaning and is just to comply with Terraform syntax.
+
+              # Example
+              terraform import sonatyperepo_system_config_mail.config_mail CONFIG_MAIL
+    sonatyperepo_system_config_product_license:
+        subCategory: ""
+        description: Configure and LDAP connection
+        name: sonatyperepo_system_config_product_license
+        title: sonatyperepo_system_config_product_license Resource - sonatyperepo
+        examples:
+            - name: license
+              manifest: |-
+                {
+                  "license_data": "${filebase64(\"/path/to/sonatype.lic\")}"
+                }
+        argumentDocs:
+            contact_company: (String) Licensed Company Name
+            contact_email: (String) Licensed Company Contact Email
+            contact_name: (String) Licensed Company Contact Name
+            effective_date: (String) License effective date
+            expiration_date: (String) License expiration date
+            features: (String) Licensed features
+            fingerprint: (String) License fingerprint
+            last_updated: (String)
+            license_data: (String, Sensitive) Base64 encoded license data
+            license_type: (String) License type
+            licensed_users: (String) Licensed User count
+            max_repo_components: (Number) Licensed Max Repo Components
+            max_repo_requests: (Number) Licensed Max Repo Requests
+        importStatements: []
+    sonatyperepo_system_iq_connection Resource - sonatyperepo:
+        subCategory: ""
+        description: Configure the Sonatype IQ Server Connection
+        name: sonatyperepo_system_iq_connection Resource - sonatyperepo
+        title: sonatyperepo_system_iq_connection Resource - sonatyperepo
+        argumentDocs:
+            authentication_method: (String) Username to use for authentication with SMTP Server
+            connection_timeout: (Number) Seconds to wait for activity before stopping and retrying the connection.
+            enabled: (Boolean) Whether to use Sonatype Repository Firewall
+            fail_open_mode_enabled: (Boolean) Allow by default when quarantine is enabled and the connection to Sonatype IQ Server fails
+            last_updated: (String)
+            nexus_trust_store_enabled: (Boolean) Use certificates stored in the Nexus Repository Manager truststore to connect to Sonatype IQ Server
+            password: (String, Sensitive) Credentials for the Sonatype Repository Firewall User
+            properties: (String) Additional properties to configure for Sonatype Repository Firewall
+            show_iq_server_link: (Boolean) Show Sonatype Repository Firewall link in Browse menu when server is enabled
+            url: (String) The address of your Sonatype IQ Server
+            username: (String) User with access to Sonatype Repository Firewall
+        importStatements: []
+    sonatyperepo_task_blobstore_compact:
+        subCategory: ""
+        description: Manage Task 'Admin - Compact blob store' (blobstore.compact)
+        name: sonatyperepo_task_blobstore_compact
+        title: sonatyperepo_task_blobstore_compact Resource - sonatyperepo
+        examples:
+            - name: task_bc
+              manifest: |-
+                {
+                  "alert_email": "",
+                  "enabled": true,
+                  "frequency": {
+                    "schedule": "manual"
+                  },
+                  "name": "test-blobstore-compact",
+                  "notification_condition": "FAILURE",
+                  "properties": {
+                    "blob_store_name": "default",
+                    "blobs_older_than": 99
+                  }
+                }
+        argumentDocs:
+            alert_email: (String) E-mail address for task notifications.
+            blob_store_name: (String) The blob store to compact
+            blobs_older_than: (Number) The number of days a blob should kept before permanent deletion (default 0).
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            schedule: (String) Type of Schedule.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_task_malware_remediator Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Task 'Automatic Malware Management' (malware.remediator) This task requires the Sonatype Repository Firewall enabled with the Security-Malicious policy set to fail to function as expected. Setting the connection to Sonatype IQ Server is a requirement forSonatype Repository Firewall to work and this task is using Firewall to generate the results.
+        name: sonatyperepo_task_malware_remediator Resource - sonatyperepo
+        title: sonatyperepo_task_malware_remediator Resource - sonatyperepo
+        argumentDocs:
+            alert_email: (String) E-mail address for task notifications.
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            enable_malware_cleanup: (Boolean) When enabled, malware found will be scheduled to be cleaned up in the target proxy repositories.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            repository_name: (String) The the proxy repository to remove malware from.
+            schedule: (String) Type of Schedule.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_task_repair_create_browse_nodes Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Task 'Repair - Rebuild repository browse' (create.browse.nodes)
+        name: sonatyperepo_task_repair_create_browse_nodes Resource - sonatyperepo
+        title: sonatyperepo_task_repair_create_browse_nodes Resource - sonatyperepo
+        argumentDocs:
+            alert_email: (String) E-mail address for task notifications.
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            repository_name: (String) The Repository to rebuild browse trees for.
+            schedule: (String) Type of Schedule.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_task_repository_docker_gc Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Task 'Docker - Delete unused manifests and images' (repository.docker.gc)
+        name: sonatyperepo_task_repository_docker_gc Resource - sonatyperepo
+        title: sonatyperepo_task_repository_docker_gc Resource - sonatyperepo
+        argumentDocs:
+            alert_email: (String) E-mail address for task notifications.
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            deploy_offset: (Number) Manifests and images deployed within this period before the task starts will not be deleted.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            repository_name: (String) The Docker repository to clean up.
+            schedule: (String) Type of Schedule.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_task_repository_docker_upload_purge Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Task 'Docker - Delete incomplete uploads' (repository.docker.upload-purge)
+        name: sonatyperepo_task_repository_docker_upload_purge Resource - sonatyperepo
+        title: sonatyperepo_task_repository_docker_upload_purge Resource - sonatyperepo
+        argumentDocs:
+            age: (Number) Delete incomplete docker uploads that are older than the specified age in hours.
+            alert_email: (String) E-mail address for task notifications.
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            schedule: (String) Type of Schedule.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_task_repository_maven_remove_snapshots Resource - sonatyperepo:
+        subCategory: ""
+        description: Manage Task 'Maven - Delete SNAPSHOT' (repository.maven.remove-snapshots)
+        name: sonatyperepo_task_repository_maven_remove_snapshots Resource - sonatyperepo
+        title: sonatyperepo_task_repository_maven_remove_snapshots Resource - sonatyperepo
+        argumentDocs:
+            alert_email: (String) E-mail address for task notifications.
+            cron_expression: (String) Cron expression for the task. Only applies for for "cron" schedule.
+            enabled: (Boolean) Indicates if the task is enabled.
+            frequency: (Attributes) Frequency Schedule for this Task. (see below for nested schema)
+            grace_period_in_days: (Number) The grace period during which snapshots with an associated release will not be deleted.
+            id: (String) The internal ID of the Task.
+            last_updated: (String)
+            minimum_retained: (Number) Minimum number of snapshots to keep for one GAV.
+            name: (String) The name of the Task.
+            notification_condition: (String) The type of Task.
+            properties: (Attributes) Properties specific to this Task type (see below for nested schema)
+            recurring_days: (List of Number) Array with the number of the days the task must run.
+            remove_if_released: (Boolean) Delete all snapshots that have a corresponding release.
+            repository_name: (String) The Maven repository or repository group to remove snapshots from.
+            schedule: (String) Type of Schedule.
+            snapshot_retention_days: (Number) Delete all snapshots older than this, provided we still keep the minimum number specified.
+            start_date: (Number) Start date of the task represented in unix timestamp. Does not apply for "manual" schedule.
+            timezone_offset: '(String) The offset time zone of the client. Example: -05:00'
+        importStatements: []
+    sonatyperepo_user:
+        subCategory: ""
+        description: Manage Local and non-Local Users
+        name: sonatyperepo_user
+        title: sonatyperepo_user Resource - sonatyperepo
+        examples:
+            - name: test_user
+              manifest: |-
+                {
+                  "email_address": "test@local.user",
+                  "first_name": "Testing",
+                  "last_name": "User",
+                  "password": "somethingSecurer",
+                  "roles": [
+                    "nx-anonymous"
+                  ],
+                  "status": "active",
+                  "user_id": "test-local-user"
+                }
+            - name: saml_admin
+              manifest: |-
+                {
+                  "email_address": "admin@somewhere.tld",
+                  "first_name": "SAML",
+                  "last_name": "Admin",
+                  "roles": [
+                    "nx-test-role"
+                  ],
+                  "status": "active",
+                  "user_id": "admin"
+                }
+        argumentDocs:
+            email_address: (String) The email address associated with the user.
+            first_name: (String) The first name of the user.
+            last_name: (String) The last name of the user.
+            last_updated: (String)
+            password: (String, Sensitive) The password for the user.
+            read_only: (Boolean)
+            roles: (Set of String) The list of roles assigned to this User.
+            source: (String)
+            status: (String) The user's status.
+            user_id: (String) The userid which is required for login. This value cannot be changed.
+        importStatements:
+            - |-
+              # Import LDAP user
+              terraform import sonatyperepo_user.saml_user my-ldap-uid,LDAP
+
+              # Import SAML user
+              terraform import sonatyperepo_user.saml_admin my-user-id,SAML
